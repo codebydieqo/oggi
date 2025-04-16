@@ -17,16 +17,15 @@ export async function handleAuth() {
   if (!userExists) {
     const user = await currentUser();
 
-    if (user)
-      await db.user.create({
-        data: {
-          user_id: user.id!,
-          email: user.emailAddresses[0].emailAddress!,
-          first_name: user.firstName,
-          last_name: user.lastName,
-          image_url: user.imageUrl,
-        },
-      });
+    await db.user.create({
+      data: {
+        user_id: userId!,
+        email: user?.emailAddresses[0]?.emailAddress!,
+        first_name: user?.firstName,
+        last_name: user?.lastName,
+        image_url: user?.imageUrl,
+      },
+    });
   }
 
   return { success: true };
