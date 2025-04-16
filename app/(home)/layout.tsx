@@ -2,7 +2,7 @@ import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { ReactNode } from "react";
-import { oi } from "../layout";
+import { oi } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SignOutButton } from "@clerk/nextjs";
 import Folders from "@/components/folders";

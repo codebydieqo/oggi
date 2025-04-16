@@ -1,6 +1,6 @@
 import MaxWidthWrapper from "@/components/max-width-wrapper";
 import { cn } from "@/lib/utils";
-import { oi } from "../layout";
+import { oi } from "@/lib/utils";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
