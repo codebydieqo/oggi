@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Oi } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "@/components/react-query-provider";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const geist = Geist({ subsets: ["latin"], weight: ["400", "600"] });
-
-export const oi = Oi({ subsets: ["latin"], weight: ["400"] });
 
 export const metadata: Metadata = {
   title: "Oggi",
