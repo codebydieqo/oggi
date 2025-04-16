@@ -5,9 +5,6 @@ import { SignInButton, SignUpButton } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
-import { db } from "@/server/db/drizzle";
-import { eq } from "drizzle-orm";
-import { users } from "@/server/db/schema";
 
 export default function App() {
   return (

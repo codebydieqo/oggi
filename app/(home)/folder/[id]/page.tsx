@@ -9,9 +9,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { db } from "@/server/db/drizzle";
-import { files, folders } from "@/server/db/schema";
+import { folders } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
-import { and, desc, eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { FileIcon } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
