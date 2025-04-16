@@ -162,6 +162,10 @@ const config = {
         "fromEnvVar": null,
         "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -169,7 +173,7 @@ const config = {
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": "../../../../.env",
+    "rootEnvPath": null,
     "schemaEnvPath": "../../../../.env"
   },
   "relativePath": "../../..",
@@ -188,8 +192,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"generated/prisma/client\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id         String   @id @default(uuid())\n  created_at DateTime @default(now())\n  email      String   @unique\n  user_id    String   @unique\n  first_name String?\n  last_name  String?\n  image_url  String?\n  folders    Folder[]\n  files      File[]\n}\n\nmodel Folder {\n  id         String   @id @default(uuid())\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n  name       String\n  user_id    String\n  user       User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)\n  files      File[]\n}\n\nmodel File {\n  id         String   @id @default(uuid())\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n  title      String\n  content    String\n  published  Boolean  @default(false)\n  user_id    String\n  folder_id  String\n  user       User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)\n  folder     Folder   @relation(fields: [folder_id], references: [id], onDelete: Cascade)\n}\n",
-  "inlineSchemaHash": "3ac502089087bb85b9b9f580a6feaa3709969bfaa93128e6298a81dffd794bfd",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  output        = \"generated/prisma/client\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id         String   @id @default(uuid())\n  created_at DateTime @default(now())\n  email      String   @unique\n  user_id    String   @unique\n  first_name String?\n  last_name  String?\n  image_url  String?\n  folders    Folder[]\n  files      File[]\n}\n\nmodel Folder {\n  id         String   @id @default(uuid())\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n  name       String\n  user_id    String\n  user       User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)\n  files      File[]\n}\n\nmodel File {\n  id         String   @id @default(uuid())\n  created_at DateTime @default(now())\n  updated_at DateTime @updatedAt\n  title      String\n  content    String\n  published  Boolean  @default(false)\n  user_id    String\n  folder_id  String\n  user       User     @relation(fields: [user_id], references: [user_id], onDelete: Cascade)\n  folder     Folder   @relation(fields: [folder_id], references: [id], onDelete: Cascade)\n}\n",
+  "inlineSchemaHash": "1eea26241ab54582d2b99699db6a94f4e6c2cda412f6ba1697bb6bd1f78b45ba",
   "copyEngine": true
 }
 
@@ -230,6 +234,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
 path.join(process.cwd(), "prisma/generated/prisma/client/query_engine-windows.dll.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node");
+path.join(process.cwd(), "prisma/generated/prisma/client/libquery_engine-rhel-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "prisma/generated/prisma/client/schema.prisma")
