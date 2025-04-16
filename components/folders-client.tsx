@@ -1,6 +1,6 @@
 "use client";
 
-import { Folder as TFolder } from "@/lib/generated/prisma";
+import { Folder as TFolder } from "@/prisma/generated/prisma/client";
 import Link from "next/link";
 import { Button } from "./ui/button";
 import { Folder, FolderOpen, FolderPlus } from "lucide-react";
