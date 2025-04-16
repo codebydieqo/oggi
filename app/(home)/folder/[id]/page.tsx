@@ -8,8 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import db from "@/server/db";
+import { db } from "@/server/db/drizzle";
+import { files, folders } from "@/server/db/schema";
 import { auth } from "@clerk/nextjs/server";
+import { and, desc, eq } from "drizzle-orm";
 import { FileIcon } from "lucide-react";
 import moment from "moment";
 import Link from "next/link";
@@ -22,16 +24,11 @@ export default async function Folder({
   const { id } = await params;
   const { userId } = await auth();
 
-  const folder = await db.folder.findUnique({
-    where: {
-      user_id: userId!,
-      id: id,
-    },
-    include: {
+  const folder = await db.query.folders.findFirst({
+    where: and(eq(folders.userId, userId!), eq(folders.id, id)),
+    with: {
       files: {
-        orderBy: {
-          created_at: "desc",
-        },
+        orderBy: (files, { desc }) => [desc(files.createdAt)],
       },
     },
   });
@@ -65,7 +62,7 @@ export default async function Folder({
                 </TableCell>
                 <TableCell className="text-center">File</TableCell>
                 <TableCell className="text-center">
-                  {moment(i.created_at).format("MM/DD/YY")}
+                  {moment(i.createdAt).format("MM/DD/YY")}
                 </TableCell>
                 <TableCell className="text-center">
                   <PublishCheck published={i.published} fileId={i.id} />

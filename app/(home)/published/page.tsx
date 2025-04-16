@@ -1,4 +1,4 @@
-import db from "@/server/db";
+import { db } from "@/server/db/drizzle";
 import {
   Table,
   TableHeader,
@@ -12,17 +12,17 @@ import moment from "moment";
 import { FileIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { eq } from "drizzle-orm";
+import { files } from "@/server/db/schema";
 
 export default async function Published() {
-  const files = await db.file.findMany({
-    where: {
-      published: true,
-    },
-    include: {
+  const data = await db.query.files.findMany({
+    where: eq(files.published, true),
+    with: {
       user: {
-        select: {
-          first_name: true,
-          last_name: true,
+        columns: {
+          firstName: true,
+          lastName: true,
         },
       },
     },
@@ -43,7 +43,7 @@ export default async function Published() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {files.map((i) => (
+          {data.map((i) => (
             <TableRow key={i.id}>
               <TableCell className="w-1/4">
                 <Link
@@ -60,12 +60,12 @@ export default async function Published() {
                   variant={"ghost"}
                   className="dark:hover:bg-transparent hover:bg-transparent cursor-default"
                 >
-                  {moment(i.created_at).format("MM/DD/YY")}
+                  {moment(i.createdAt).format("MM/DD/YY")}
                 </Button>
               </TableCell>
               <TableCell className="text-end">
                 <Badge>
-                  {i.user.first_name} {i.user.last_name}
+                  {i.user.firstName} {i.user.lastName}
                 </Badge>
               </TableCell>
             </TableRow>

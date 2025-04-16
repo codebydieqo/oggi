@@ -1,30 +1,28 @@
 "use server";
 
-import db from "./db";
+import { db } from "./db/drizzle";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { users, folders, files } from "./db/schema";
+import { and, eq } from "drizzle-orm";
 
 export async function handleAuth() {
   const { userId } = await auth();
 
-  const userExists = await db.user.findUnique({
-    where: {
-      user_id: userId!,
-    },
+  const userExists = await db.query.users.findFirst({
+    where: eq(users.userId, userId!),
   });
 
   if (!userExists) {
     const user = await currentUser();
 
-    await db.user.create({
-      data: {
-        user_id: userId!,
-        email: user?.emailAddresses[0]?.emailAddress!,
-        first_name: user?.firstName,
-        last_name: user?.lastName,
-        image_url: user?.imageUrl,
-      },
+    await db.insert(users).values({
+      userId: userId!,
+      email: user?.emailAddresses[0].emailAddress!,
+      firstName: user?.firstName!,
+      lastName: user?.lastName!,
+      imageUrl: user?.imageUrl!,
     });
   }
 
@@ -39,11 +37,9 @@ export async function createFolder(body: { name: string }) {
   }
 
   if (body.name.replace(" ", "").length !== 0) {
-    await db.folder.create({
-      data: {
-        user_id: userId,
-        name: body.name,
-      },
+    await db.insert(folders).values({
+      userId: userId!,
+      name: body.name,
     });
   } else {
     return null;
@@ -59,12 +55,9 @@ export async function deleteFile(body: { fileId: string }) {
     throw new Error("Unauthorized");
   }
 
-  await db.file.delete({
-    where: {
-      user_id: userId,
-      id: body.fileId,
-    },
-  });
+  await db
+    .delete(files)
+    .where(and(eq(files.id, body.fileId), eq(files.userId, userId)));
 
   revalidatePath("/folder/:id");
 }
@@ -77,25 +70,15 @@ export async function handlePublish(body: { fileId: string; status: boolean }) {
   }
 
   if (body.status) {
-    await db.file.update({
-      where: {
-        user_id: userId,
-        id: body.fileId,
-      },
-      data: {
-        published: false,
-      },
-    });
+    await db
+      .update(files)
+      .set({ published: false })
+      .where(and(eq(files.userId, userId), eq(files.id, body.fileId)));
   } else if (!body.status) {
-    await db.file.update({
-      where: {
-        user_id: userId,
-        id: body.fileId,
-      },
-      data: {
-        published: true,
-      },
-    });
+    await db
+      .update(files)
+      .set({ published: true })
+      .where(and(eq(files.userId, userId), eq(files.id, body.fileId)));
   }
 
   revalidatePath("/folder/:id");
@@ -108,17 +91,15 @@ export async function getUserFolders() {
     throw new Error("Unauthorized");
   }
 
-  const folders = await db.folder.findMany({
-    where: {
-      user_id: userId,
-    },
-    select: {
+  const data = await db.query.folders.findMany({
+    where: eq(folders.userId, userId),
+    columns: {
       id: true,
       name: true,
     },
   });
 
-  return folders;
+  return data;
 }
 
 export async function createFile(body: {
@@ -132,13 +113,11 @@ export async function createFile(body: {
     throw new Error("Unauthorized");
   }
 
-  await db.file.create({
-    data: {
-      title: body.title,
-      content: body.content,
-      folder_id: body.folder_id,
-      user_id: userId,
-    },
+  await db.insert(files).values({
+    title: body.title!,
+    content: body.content!,
+    folderId: body.folder_id!,
+    userId: userId!,
   });
 
   redirect(`/folder/${body.folder_id}`);
@@ -151,11 +130,8 @@ export async function getFile(fileId: string) {
     throw new Error("Unauthorized");
   }
 
-  const file = await db.file.findUnique({
-    where: {
-      user_id: userId,
-      id: fileId,
-    },
+  const file = await db.query.files.findFirst({
+    where: and(eq(files.id, fileId)),
   });
 
   return file;
@@ -172,22 +148,14 @@ export async function updateFile(body: {
     throw new Error("Unauthorized");
   }
 
-  const fileBelongsToUser = await db.file.findUnique({
-    where: {
-      user_id: userId,
-      id: body.fileId,
-    },
+  const fileBelongsToUser = await db.query.files.findFirst({
+    where: and(eq(files.userId, userId), eq(files.id, body.fileId)),
   });
 
   if (fileBelongsToUser) {
-    await db.file.update({
-      where: {
-        id: body.fileId,
-      },
-      data: {
-        title: body.title,
-        content: body.content,
-      },
-    });
+    await db
+      .update(files)
+      .set({ title: body.title, content: body.content })
+      .where(and(eq(files.id, body.fileId), eq(files.userId, userId)));
   }
 }

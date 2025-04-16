@@ -1,9 +1,9 @@
 "use client";
 
-import { Folder as TFolder } from "@/prisma/generated/prisma/client";
+import { Folder } from "@/server/db/schema";
 import Link from "next/link";
 import { Button } from "./ui/button";
-import { Folder, FolderOpen, FolderPlus } from "lucide-react";
+import { FolderIcon, FolderOpen, FolderPlus } from "lucide-react";
 import { usePathname } from "next/navigation";
 import {
   Dialog,
@@ -15,10 +15,21 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
+import { createFolder } from "@/server/actions";
+import { useState } from "react";
 
-export default function FoldersClient({ folders }: { folders: TFolder[] }) {
+export default function FoldersClient({ folders }: { folders: Folder[] }) {
   const pathname = usePathname();
+  const [name, setName] = useState("");
 
+  const onSubmit = async () => {
+    if (name.replace(" ", "").length === 0) {
+      return null;
+    } else {
+      await createFolder({ name });
+      setName("");
+    }
+  };
   return (
     <div className="w-1/5 h-full border-r py-4 pr-4 flex flex-col gap-2">
       <div className="w-full flex justify-between items-center">
@@ -36,9 +47,14 @@ export default function FoldersClient({ folders }: { folders: TFolder[] }) {
                 Enter a name for your new folder.
               </DialogDescription>
             </DialogHeader>
-            <Input placeholder="Folder Name" className="my-4" />
+            <Input
+              placeholder="Folder Name"
+              className="my-4"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
             <DialogFooter>
-              <Button>Create Folder</Button>
+              <Button onClick={onSubmit}>Create Folder</Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -52,7 +68,7 @@ export default function FoldersClient({ folders }: { folders: TFolder[] }) {
             {pathname === `/folder/${i.id}` ? (
               <FolderOpen className="text-[#4682B4]" />
             ) : (
-              <Folder />
+              <FolderIcon />
             )}
             {i.name}
           </Button>
