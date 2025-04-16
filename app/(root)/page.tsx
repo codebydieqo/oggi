@@ -8,8 +8,6 @@ import { ModeToggle } from "@/components/mode-toggle";
 import db from "@/server/db";
 
 export default async function App() {
-  const users = await db.user.findMany();
-
   return (
     <div className="relative">
       <ModeToggle className="absolute top-5 right-5" />

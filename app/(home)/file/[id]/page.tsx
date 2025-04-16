@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { getFile } from "@/server/actions";
@@ -23,10 +23,15 @@ export default function File() {
     queryFn: async () => await getFile(id as string),
   });
 
-  const [title, setTitle] = useState(data?.title!);
-  const [blocks, setBlocks] = useState<Block[] | string | undefined>(
-    data?.content
-  );
+  const [title, setTitle] = useState("");
+  const [blocks, setBlocks] = useState<Block[] | string | undefined>(undefined);
+
+  useEffect(() => {
+    if (data) {
+      setTitle(data.title);
+      setBlocks(data.content);
+    }
+  }, [data]);
 
   const onSubmit = async () => {
     await updateFile({
